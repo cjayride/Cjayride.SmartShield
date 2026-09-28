@@ -1,0 +1,10 @@
+bin/
+obj/
+Environment.props
+*.user
+.vs/
+Package/*.dll
+Package/*.zip
+thunderstore-upload/
+dump-methods.txt
+_stage*/
