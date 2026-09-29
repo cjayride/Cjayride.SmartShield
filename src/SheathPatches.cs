@@ -42,7 +42,7 @@ namespace Cjayride.SmartShield
                 return;
             }
 
-            // Don't restore a stashed shield onto the back/hand when drawing the weapon.
+            // Don't restore a stashed shield when drawing (shield stays in inventory for auto-equip).
             ItemDrop.ItemData hiddenLeft = __instance.m_hiddenLeftItem;
             if (hiddenLeft?.m_shared != null &&
                 hiddenLeft.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)

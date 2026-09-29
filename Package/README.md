@@ -8,6 +8,10 @@ Disable AutoEquipShield if both are installed.
 
 ## Changelog
 
+### 1.0.11
+
+- Fix: default `UnequipOnSheath` is now **false** so R-sheath shows weapon + shield on your back (vanilla). Set `UnequipOnSheath = true` if you prefer weapon-only on the back.
+
 ### 1.0.10
 
 - Fix: first sword draw after spawn now auto-equips the shield (warmup no longer baselines the weapon without applying).

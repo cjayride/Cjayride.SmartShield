@@ -10,7 +10,7 @@ namespace Cjayride.SmartShield
     {
         public const string PluginGUID = "cjayride.smartshield";
         public const string PluginName = "SmartShield";
-        public const string PluginVersion = "1.0.10";
+        public const string PluginVersion = "1.0.11";
 
         internal static Plugin Instance;
         internal static Harmony Harmony;

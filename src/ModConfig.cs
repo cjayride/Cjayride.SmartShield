@@ -28,8 +28,8 @@ namespace Cjayride.SmartShield
                 "Also equip a shield after switching from a bow/crossbow (or other ranged) to a one-handed weapon.");
             UnequipOnTwoHanded = config.Bind("Behavior", "UnequipOnTwoHanded", true,
                 "Unequip the shield when a two-handed or ranged weapon is equipped.");
-            UnequipOnSheath = config.Bind("Behavior", "UnequipOnSheath", true,
-                "Unequip the shield when weapons are sheathed with R (clears the back slot).");
+            UnequipOnSheath = config.Bind("Behavior", "UnequipOnSheath", false,
+                "When true, stow the shield in inventory on R-sheath (weapon-only on your back). When false, vanilla dual back display (weapon + shield).");
             UnequipOnHotbarDeselect = config.Bind("Behavior", "UnequipOnHotbarDeselect", true,
                 "Unequip the shield when you deselect a one-handed weapon on the hotbar (press the same slot again). Does not unequip if you manually equip a shield alone.");
 

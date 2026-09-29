@@ -4,4 +4,4 @@ Valheim BepInEx mod that auto-equips a shield when you switch to a one-handed we
 
 See [Package/README.md](Package/README.md) for changelog and config.
 
-Thunderstore package zip: `Package/Cjayride.SmartShield-1.0.10.zip` (build artifacts; not committed).
+Thunderstore package zip: `Package/Cjayride.SmartShield-1.0.11.zip` (build artifacts; not committed).
