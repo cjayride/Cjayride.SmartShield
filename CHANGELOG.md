@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.12
+
+- Verified against Valheim 1.0.21 (Steam build 26249040).
+- BepInEx dependency set to `denikson-BepInExPack_Valheim-5.4.2360`.
+
 ## 1.0.11
 
 - Default `UnequipOnSheath` is now **false** so R-sheath shows weapon + shield on your back (vanilla). Set `UnequipOnSheath = true` if you prefer weapon-only on the back.
