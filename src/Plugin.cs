@@ -1,4 +1,3 @@
-using System.Reflection;
 using BepInEx;
 using HarmonyLib;
 using UnityEngine;
@@ -10,7 +9,7 @@ namespace Cjayride.SmartShield
     {
         public const string PluginGUID = "cjayride.smartshield";
         public const string PluginName = "SmartShield";
-        public const string PluginVersion = "1.0.12";
+        public const string PluginVersion = "1.0.14";
 
         internal static Plugin Instance;
         internal static Harmony Harmony;
@@ -26,7 +25,11 @@ namespace Cjayride.SmartShield
             Instance = this;
             ModConfig.Bind(Config);
             Harmony = new Harmony(PluginGUID);
-            Harmony.PatchAll(Assembly.GetExecutingAssembly());
+            Harmony.PatchAll(typeof(PatchHideHandItems));
+            Harmony.PatchAll(typeof(PatchShowHandItems));
+            Harmony.PatchAll(typeof(PatchEquipItem));
+            Harmony.PatchAll(typeof(PatchUnequipItem));
+            Harmony.PatchAll(typeof(PatchOnAttackTrigger));
             Logger.LogInfo("SmartShield " + PluginVersion + " loaded.");
         }
 
@@ -52,9 +55,31 @@ namespace Cjayride.SmartShield
                 return;
             }
 
-            // Brief idle so VisEquipment exists, but not so long the first sword draw is missed.
             if (Time.unscaledTime < _seenPlayerAt + 1.5f)
             {
+                return;
+            }
+
+            if (!_baselined)
+            {
+                ShieldService.Baseline(player);
+                _baselined = true;
+                ShieldService.Apply();
+                _catchUpPolls = 3;
+                _nextPoll = Time.unscaledTime + 0.25f;
+                return;
+            }
+
+            if (_catchUpPolls > 0)
+            {
+                if (Time.unscaledTime < _nextPoll)
+                {
+                    return;
+                }
+
+                _nextPoll = Time.unscaledTime + 0.25f;
+                _catchUpPolls--;
+                ShieldService.Tick(player);
                 return;
             }
 
@@ -63,26 +88,8 @@ namespace Cjayride.SmartShield
                 return;
             }
 
-            _nextPoll = Time.unscaledTime + 0.12f;
-
-            if (!_baselined)
-            {
-                ShieldService.Baseline(player);
-                _baselined = true;
-                // Sword may already be out from during warmup — Tick would never see a change.
-                ShieldService.Apply();
-                _catchUpPolls = 10;
-                return;
-            }
-
+            _nextPoll = Time.unscaledTime + 0.75f;
             ShieldService.Tick(player);
-
-            // Retry a few times in case the first EquipItem raced inventory/vis setup.
-            if (_catchUpPolls > 0)
-            {
-                _catchUpPolls--;
-                ShieldService.Apply();
-            }
         }
     }
 }

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.14
+
+- Throwing a spear no longer unequips the shield. The last spear leaving your hand is treated as a throw, not a hotbar deselect.
+
+## 1.0.13
+
+- Re-verified against Valheim 1.0.21 (Steam build 26249040): HideHandItems, ShowHandItems, EquipItem, UnequipItem, and VisEquipment left-back APIs are unchanged.
+- Auto-equip now reacts to Equip/Unequip instead of polling 8 times per second. Update() is a slow safety net after spawn.
+- Cached weapon/shield filter lists; scan inventory in place; skip shield-visual rebuild when nothing is attached.
+
 ## 1.0.12
 
 - Verified against Valheim 1.0.21 (Steam build 26249040).

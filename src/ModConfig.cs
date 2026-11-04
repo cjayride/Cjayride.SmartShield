@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using BepInEx.Configuration;
 
 namespace Cjayride.SmartShield
@@ -17,6 +19,11 @@ namespace Cjayride.SmartShield
 
         internal static ConfigEntry<string> AllowedWeaponTypes;
         internal static ConfigEntry<string> BlacklistShields;
+
+        internal static string[] AllowedWeaponTokens = Array.Empty<string>();
+        internal static HashSet<string> BlacklistSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        internal static string SelectionModeNormalized = "Best";
+        internal static string PreferredShieldNormalized = "";
 
         internal static void Bind(ConfigFile config)
         {
@@ -42,6 +49,61 @@ namespace Cjayride.SmartShield
                 "Comma-separated ItemType, skill, or prefab names. Empty = all one-handed weapons.");
             BlacklistShields = config.Bind("Filters", "BlacklistShields", "",
                 "Comma-separated shield prefab names that must never be auto-equipped.");
+
+            AllowedWeaponTypes.SettingChanged += (_, __) => RebuildCaches();
+            BlacklistShields.SettingChanged += (_, __) => RebuildCaches();
+            SelectionMode.SettingChanged += (_, __) => RebuildCaches();
+            PreferredShield.SettingChanged += (_, __) => RebuildCaches();
+            RebuildCaches();
+        }
+
+        internal static void RebuildCaches()
+        {
+            AllowedWeaponTokens = SplitList(AllowedWeaponTypes.Value);
+            BlacklistSet = new HashSet<string>(SplitList(BlacklistShields.Value), StringComparer.OrdinalIgnoreCase);
+            SelectionModeNormalized = (SelectionMode.Value ?? "Best").Trim();
+            PreferredShieldNormalized = (PreferredShield.Value ?? "").Trim();
+        }
+
+        internal static string[] SplitList(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return Array.Empty<string>();
+            }
+
+            string[] parts = raw.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+            int count = 0;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                parts[i] = parts[i].Trim();
+                if (parts[i].Length > 0)
+                {
+                    count++;
+                }
+            }
+
+            if (count == 0)
+            {
+                return Array.Empty<string>();
+            }
+
+            if (count == parts.Length)
+            {
+                return parts;
+            }
+
+            string[] trimmed = new string[count];
+            int n = 0;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                if (parts[i].Length > 0)
+                {
+                    trimmed[n++] = parts[i];
+                }
+            }
+
+            return trimmed;
         }
     }
 }

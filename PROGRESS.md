@@ -1,17 +1,17 @@
-# SmartShield — Valheim 1.0.21 release
+# SmartShield — keep shield on spear throw
 
 ## Goal
-- Verify Release build against Valheim 1.0.21 (Steam build 26249040).
-- BepInEx dependency `denikson-BepInExPack_Valheim-5.4.2360`.
-- Changelog, Thunderstore zip in `dist/`, commit, push, tag `v1.0.12`.
+- When a player throws a spear, do not unequip the shield.
 
 ## Status
-- Completed: Release build succeeded; zip at `dist/Cjayride.SmartShield-1.0.12.zip`.
+- Completed: 1.0.14 Release build succeeded.
 
 ## Output
 - DLL: `D:\AI-Agent-Projects\cjaycraft\Cjayride.SmartShield\bin\Release\net481\Cjayride.SmartShield.dll`
-- Zip: `D:\AI-Agent-Projects\cjaycraft\Cjayride.SmartShield\dist\Cjayride.SmartShield-1.0.12.zip`
 
 ## Changes
-- Version 1.0.12 in csproj, Plugin.cs, manifest.
-- `pack.ps1`, `dist/` in `.gitignore`, `Package/icon.png` restored from prior release asset.
+- `UnequipItem` prefix: if a throwable one-hander (Spears, or projectile attack) is unequipped while attacking, set a 1s ignore window so hotbar-deselect logic does not strip the shield.
+- `Attack.OnAttackTrigger` also sets that window for one-handed projectile attacks.
+
+## Commands
+- `dotnet build Cjayride.SmartShield.csproj -c Release` — succeeded, 0 warnings.

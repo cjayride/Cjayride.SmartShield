@@ -6,15 +6,11 @@ namespace Cjayride.SmartShield
 {
     internal static class ShieldService
     {
-        /// <summary>True while we call Equip/Unequip so our patches do not re-enter.</summary>
         internal static bool InternalChange;
 
-        /// <summary>Right-hand item was ranged/two-handed before the latest swap.</summary>
         private static bool _previousWasRangedOrTwoHanded;
         private static ItemDrop.ItemData _lastRight;
         private static bool _wasSheathed;
-
-        /// <summary>Ignore hotbar-deselect unequip briefly after drawing hands (R).</summary>
         private static float _ignoreHotbarUnequipUntil;
 
         internal static void Baseline(Player player)
@@ -36,6 +32,28 @@ namespace Cjayride.SmartShield
             }
         }
 
+        /// <summary>Keep the shield when a spear (or other throwable one-hander) leaves the right hand mid-throw.</summary>
+        internal static void NotifyThrownWeapon()
+        {
+            _ignoreHotbarUnequipUntil = Time.unscaledTime + 1.0f;
+        }
+
+        internal static void OnLocalEquipmentChanged(Humanoid humanoid)
+        {
+            if (InternalChange || !PatchHelpers.ModEnabled() || !PatchHelpers.IsLocal(humanoid))
+            {
+                return;
+            }
+
+            Player player = humanoid as Player;
+            if (player == null)
+            {
+                return;
+            }
+
+            Tick(player);
+        }
+
         internal static void Tick(Player player)
         {
             ItemDrop.ItemData prevRight = _lastRight;
@@ -43,7 +61,6 @@ namespace Cjayride.SmartShield
             ItemDrop.ItemData left = player.GetLeftItem();
             bool sheathed = IsSheathed(player);
 
-            // Keep correcting while R-sheathed if a shield is still on hand/back.
             if (ModConfig.UnequipOnSheath.Value && sheathed && ShieldStillAttachedWhileSheathed(player))
             {
                 _lastRight = right;
@@ -59,8 +76,6 @@ namespace Cjayride.SmartShield
                 return;
             }
 
-            // Hotbar deselect only: had a one-hander, now empty hands (not R-sheath).
-            // Do NOT unequip when the player manually equips a shield with empty main hand.
             if (ModConfig.UnequipOnHotbarDeselect.Value
                 && Time.unscaledTime >= _ignoreHotbarUnequipUntil
                 && right == null
@@ -116,7 +131,6 @@ namespace Cjayride.SmartShield
             bool previousRanged = _previousWasRangedOrTwoHanded;
             _previousWasRangedOrTwoHanded = right?.m_shared != null && IsRangedOrTwoHanded(right.m_shared.m_itemType);
 
-            // R sheath: weapon stashed in m_hiddenRightItem.
             if (IsSheathed(player))
             {
                 if (ModConfig.UnequipOnSheath.Value)
@@ -127,16 +141,15 @@ namespace Cjayride.SmartShield
                 return;
             }
 
-            // Empty main hand (hotbar deselect / shield-only): do not auto-strip the
-            // shield here. Tick handles hotbar deselect as a one-hander → empty transition.
             if (right == null)
             {
                 return;
             }
 
-            if (IsRangedOrTwoHanded(right.m_shared.m_itemType))
+            ItemDrop.ItemData.ItemType rightType = right.m_shared.m_itemType;
+            if (IsRangedOrTwoHanded(rightType))
             {
-                if (ModConfig.UnequipOnTwoHanded.Value && left != null &&
+                if (ModConfig.UnequipOnTwoHanded.Value && left?.m_shared != null &&
                     left.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
                 {
                     UnequipSilent(player, left);
@@ -145,7 +158,7 @@ namespace Cjayride.SmartShield
                 return;
             }
 
-            if (right == null || !IsOneHandedWeapon(right))
+            if (rightType != ItemDrop.ItemData.ItemType.OneHandedWeapon)
             {
                 return;
             }
@@ -166,13 +179,7 @@ namespace Cjayride.SmartShield
                 return;
             }
 
-            // Off-hand must be empty or already a shield (never steal a torch, etc.).
-            if (left != null && left.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Shield)
-            {
-                return;
-            }
-
-            if (left != null && left.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
+            if (left != null)
             {
                 return;
             }
@@ -205,13 +212,16 @@ namespace Cjayride.SmartShield
             }
 
             ItemDrop.ItemData hiddenLeft = humanoid.m_hiddenLeftItem;
-            return hiddenLeft?.m_shared != null &&
-                   hiddenLeft.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield;
+            if (hiddenLeft?.m_shared != null &&
+                hiddenLeft.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
+            {
+                return true;
+            }
+
+            VisEquipment vis = humanoid.m_visEquipment;
+            return vis != null && (vis.m_leftBackItemInstance != null || vis.m_currentLeftBackItemHash != 0);
         }
 
-        /// <summary>
-        /// Called from HideHandItems prefix/postfix and from the poll. Clears hand + back shield mesh.
-        /// </summary>
         internal static void RetractShieldWhileSheathed(Humanoid humanoid)
         {
             if (humanoid == null)
@@ -219,10 +229,12 @@ namespace Cjayride.SmartShield
                 return;
             }
 
+            bool changed = false;
             ItemDrop.ItemData left = humanoid.GetLeftItem();
             if (left?.m_shared != null && left.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
             {
                 UnequipSilent(humanoid, left);
+                changed = true;
             }
 
             ItemDrop.ItemData hiddenLeft = humanoid.m_hiddenLeftItem;
@@ -230,12 +242,17 @@ namespace Cjayride.SmartShield
                 hiddenLeft.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
             {
                 humanoid.m_hiddenLeftItem = null;
+                changed = true;
             }
 
-            // Always force the back-slot visual off. SetLeftBackItem alone only writes the
-            // ZDO; UpdateEquipmentVisuals destroys m_leftBackItemInstance.
             VisEquipment vis = humanoid.m_visEquipment;
             if (vis == null)
+            {
+                return;
+            }
+
+            bool hasBackVisual = vis.m_leftBackItemInstance != null || vis.m_currentLeftBackItemHash != 0;
+            if (!changed && !hasBackVisual)
             {
                 return;
             }
@@ -245,23 +262,17 @@ namespace Cjayride.SmartShield
             {
                 UnityEngine.Object.Destroy(vis.m_leftBackItemInstance);
                 vis.m_leftBackItemInstance = null;
-                vis.m_currentLeftBackItemHash = 0;
-                vis.m_currentLeftBackItemVariant = 0;
-                vis.m_currentLeftBackItemQuality = 0;
             }
 
-            humanoid.SetupVisEquipment(vis, false);
+            vis.m_currentLeftBackItemHash = 0;
+            vis.m_currentLeftBackItemVariant = 0;
+            vis.m_currentLeftBackItemQuality = 0;
             vis.UpdateEquipmentVisuals();
-        }
-
-        internal static void UnequipSilentPublic(Humanoid player, ItemDrop.ItemData item)
-        {
-            UnequipSilent(player, item);
         }
 
         private static bool IsOneHandedWeapon(ItemDrop.ItemData item)
         {
-            return item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.OneHandedWeapon;
+            return item?.m_shared != null && item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.OneHandedWeapon;
         }
 
         private static bool IsRangedOrTwoHanded(ItemDrop.ItemData.ItemType type)
@@ -274,8 +285,8 @@ namespace Cjayride.SmartShield
 
         private static bool WeaponAllowed(ItemDrop.ItemData weapon)
         {
-            string raw = ModConfig.AllowedWeaponTypes.Value;
-            if (string.IsNullOrWhiteSpace(raw))
+            string[] tokens = ModConfig.AllowedWeaponTokens;
+            if (tokens.Length == 0)
             {
                 return true;
             }
@@ -283,8 +294,9 @@ namespace Cjayride.SmartShield
             string prefab = PrefabName(weapon);
             string typeName = weapon.m_shared.m_itemType.ToString();
             string skill = weapon.m_shared.m_skillType.ToString();
-            foreach (string token in SplitList(raw))
+            for (int i = 0; i < tokens.Length; i++)
             {
+                string token = tokens[i];
                 if (token.Equals(typeName, StringComparison.OrdinalIgnoreCase)
                     || token.Equals(skill, StringComparison.OrdinalIgnoreCase)
                     || token.Equals(prefab, StringComparison.OrdinalIgnoreCase))
@@ -298,10 +310,24 @@ namespace Cjayride.SmartShield
 
         private static ItemDrop.ItemData SelectShield(Player player)
         {
-            List<ItemDrop.ItemData> items = player.GetInventory().GetAllItems();
-            HashSet<string> banned = new HashSet<string>(SplitList(ModConfig.BlacklistShields.Value), StringComparer.OrdinalIgnoreCase);
-            string mode = (ModConfig.SelectionMode.Value ?? "Best").Trim();
-            string preferred = (ModConfig.PreferredShield.Value ?? "").Trim();
+            Inventory inventory = player.GetInventory();
+            if (inventory == null)
+            {
+                return null;
+            }
+
+            List<ItemDrop.ItemData> items = inventory.m_inventory;
+            if (items == null || items.Count == 0)
+            {
+                return null;
+            }
+
+            HashSet<string> banned = ModConfig.BlacklistSet;
+            bool hasBan = banned != null && banned.Count > 0;
+            string mode = ModConfig.SelectionModeNormalized;
+            string preferred = ModConfig.PreferredShieldNormalized;
+            bool prefer = mode.Equals("Preferred", StringComparison.OrdinalIgnoreCase) && preferred.Length > 0;
+            bool first = mode.Equals("First", StringComparison.OrdinalIgnoreCase);
 
             ItemDrop.ItemData best = null;
             float bestBlock = float.MinValue;
@@ -315,12 +341,12 @@ namespace Cjayride.SmartShield
                 }
 
                 string prefab = PrefabName(item);
-                if (banned.Contains(prefab))
+                if (hasBan && banned.Contains(prefab))
                 {
                     continue;
                 }
 
-                if (mode.Equals("Preferred", StringComparison.OrdinalIgnoreCase) && preferred.Length > 0)
+                if (prefer)
                 {
                     if (prefab.Equals(preferred, StringComparison.OrdinalIgnoreCase))
                     {
@@ -330,7 +356,7 @@ namespace Cjayride.SmartShield
                     continue;
                 }
 
-                if (mode.Equals("First", StringComparison.OrdinalIgnoreCase))
+                if (first)
                 {
                     return item;
                 }
@@ -343,16 +369,15 @@ namespace Cjayride.SmartShield
                 }
             }
 
-            // Preferred missing: fall back to highest block so the swap still works.
-            if (best == null && mode.Equals("Preferred", StringComparison.OrdinalIgnoreCase))
+            if (best == null && prefer)
             {
-                return SelectFallbackBest(items, banned);
+                return SelectFallbackBest(items, banned, hasBan);
             }
 
             return best;
         }
 
-        private static ItemDrop.ItemData SelectFallbackBest(List<ItemDrop.ItemData> items, HashSet<string> banned)
+        private static ItemDrop.ItemData SelectFallbackBest(List<ItemDrop.ItemData> items, HashSet<string> banned, bool hasBan)
         {
             ItemDrop.ItemData best = null;
             float bestBlock = float.MinValue;
@@ -364,7 +389,7 @@ namespace Cjayride.SmartShield
                     continue;
                 }
 
-                if (banned.Contains(PrefabName(item)))
+                if (hasBan && banned.Contains(PrefabName(item)))
                 {
                     continue;
                 }
@@ -414,27 +439,6 @@ namespace Cjayride.SmartShield
             }
 
             return item.m_shared.m_name ?? "";
-        }
-
-        private static List<string> SplitList(string raw)
-        {
-            List<string> list = new List<string>();
-            if (string.IsNullOrWhiteSpace(raw))
-            {
-                return list;
-            }
-
-            string[] parts = raw.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < parts.Length; i++)
-            {
-                string t = parts[i].Trim();
-                if (t.Length > 0)
-                {
-                    list.Add(t);
-                }
-            }
-
-            return list;
         }
     }
 }

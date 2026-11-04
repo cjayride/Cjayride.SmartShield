@@ -28,7 +28,7 @@ Configuration file:
 ## 📁 Package Information
 
 - **Thunderstore package:** `Cjayride.SmartShield`
-- **Build artifact:** `dist/Cjayride.SmartShield-1.0.12.zip`  
+- **Build artifact:** `dist/Cjayride.SmartShield-1.0.14.zip`  
   *Generated during the build process; not committed to the repository.*
 
 See [`CHANGELOG.md`](CHANGELOG.md) for release history. Thunderstore page copy lives in [`Package/README.md`](Package/README.md).
