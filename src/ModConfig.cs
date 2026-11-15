@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BepInEx.Configuration;
+using UnityEngine;
 
 namespace Cjayride.SmartShield
 {
@@ -17,12 +18,15 @@ namespace Cjayride.SmartShield
         internal static ConfigEntry<string> SelectionMode;
         internal static ConfigEntry<string> PreferredShield;
 
+        internal static ConfigEntry<bool> EquipShieldWithAxe;
+        internal static ConfigEntry<KeyboardShortcut> MenuHotkey;
+
         internal static ConfigEntry<string> AllowedWeaponTypes;
         internal static ConfigEntry<string> BlacklistShields;
 
         internal static string[] AllowedWeaponTokens = Array.Empty<string>();
         internal static HashSet<string> BlacklistSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        internal static string SelectionModeNormalized = "Best";
+        internal static string SelectionModeNormalized = "First";
         internal static string PreferredShieldNormalized = "";
 
         internal static void Bind(ConfigFile config)
@@ -40,10 +44,14 @@ namespace Cjayride.SmartShield
             UnequipOnHotbarDeselect = config.Bind("Behavior", "UnequipOnHotbarDeselect", true,
                 "Unequip the shield when you deselect a one-handed weapon on the hotbar (press the same slot again). Does not unequip if you manually equip a shield alone.");
 
-            SelectionMode = config.Bind("ShieldSelection", "SelectionMode", "Best",
+            SelectionMode = config.Bind("ShieldSelection", "SelectionMode", "First",
                 "Best = highest block power. First = first shield in inventory. Preferred = use PreferredShield.");
             PreferredShield = config.Bind("ShieldSelection", "PreferredShield", "",
                 "Prefab name used when SelectionMode is Preferred (example: ShieldWood).");
+            EquipShieldWithAxe = config.Bind("ShieldSelection", "EquipShieldWithAxe", false,
+                "When false, do not auto-equip a shield with a one-handed axe (tree chopping).");
+            MenuHotkey = config.Bind("UI", "MenuHotkey", new KeyboardShortcut(KeyCode.S, KeyCode.LeftAlt),
+                "Opens the SmartShield popup (selection mode and axe shield toggle). Default Alt+S.");
 
             AllowedWeaponTypes = config.Bind("Filters", "AllowedWeaponTypes", "",
                 "Comma-separated ItemType, skill, or prefab names. Empty = all one-handed weapons.");

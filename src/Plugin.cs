@@ -9,7 +9,7 @@ namespace Cjayride.SmartShield
     {
         public const string PluginGUID = "cjayride.smartshield";
         public const string PluginName = "SmartShield";
-        public const string PluginVersion = "1.0.14";
+        public const string PluginVersion = "1.0.18";
 
         internal static Plugin Instance;
         internal static Harmony Harmony;
@@ -30,11 +30,17 @@ namespace Cjayride.SmartShield
             Harmony.PatchAll(typeof(PatchEquipItem));
             Harmony.PatchAll(typeof(PatchUnequipItem));
             Harmony.PatchAll(typeof(PatchOnAttackTrigger));
+            Harmony.PatchAll(typeof(PatchPlayerTakeInput));
+            Harmony.PatchAll(typeof(PatchControllerTakeInput));
+            Harmony.PatchAll(typeof(PatchControllerInInventoryEtc));
+            Harmony.PatchAll(typeof(PatchMouseCapture));
             Logger.LogInfo("SmartShield " + PluginVersion + " loaded.");
         }
 
         private void Update()
         {
+            OptionsMenu.Tick();
+
             if (!ModConfig.Enabled.Value)
             {
                 return;
@@ -90,6 +96,11 @@ namespace Cjayride.SmartShield
 
             _nextPoll = Time.unscaledTime + 0.75f;
             ShieldService.Tick(player);
+        }
+
+        private void OnGUI()
+        {
+            OptionsMenu.Draw();
         }
     }
 }

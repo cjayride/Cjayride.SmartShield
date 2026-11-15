@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.0.18
+
+- Cursor no longer flickers: Valheim mouse-capture is released while the menu is open (no per-OnGUI cursor fighting).
+- Behavior checkboxes are larger (28px) and the whole row is clickable.
+- Menu draw is limited to Repaint events so the overlay does not extra-fill during layout.
+
+## 1.0.17
+
+- Dropdown list is boxed with a gold border and spaced rows so it no longer blends into Preferred shield.
+- Selected row and Apply use muted gold instead of a bright yellow fill.
+- Shield icon on the title; behavior toggles each have a matching icon (sword+shield, axe, bow, two-hander, back, hotbar).
+
+## 1.0.16
+
+- Alt+S menu now locks mouse look and movement so you can click it.
+- Larger SeneaL-styled window (dark plate, gold type) with the full config: enable, selection mode, preferred shield, behavior toggles, and filters.
+- Right-click no longer closes the menu (Esc / Close / Alt+S).
+
+## 1.0.15
+
+- Alt+S opens a small SmartShield popup: choose Best or First shield in inventory, and toggle whether a 1H axe auto-equips a shield (off for tree chopping).
+
 ## 1.0.14
 
 - Throwing a spear no longer unequips the shield. The last spear leaving your hand is treated as a throw, not a hotbar deselect.

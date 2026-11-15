@@ -101,6 +101,23 @@ namespace Cjayride.SmartShield
             Apply();
         }
 
+        internal static void ReapplyFromMenu()
+        {
+            Player player = Player.m_localPlayer;
+            if (player == null || player.IsDead())
+            {
+                return;
+            }
+
+            ItemDrop.ItemData left = player.GetLeftItem();
+            if (left?.m_shared != null && left.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
+            {
+                UnequipSilent(player, left);
+            }
+
+            Apply();
+        }
+
         internal static void Apply()
         {
             if (!ModConfig.Enabled.Value || InternalChange)
@@ -165,6 +182,16 @@ namespace Cjayride.SmartShield
 
             if (!WeaponAllowed(right))
             {
+                return;
+            }
+
+            if (!ModConfig.EquipShieldWithAxe.Value && IsOneHandedAxe(right))
+            {
+                if (left?.m_shared != null && left.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
+                {
+                    UnequipSilent(player, left);
+                }
+
                 return;
             }
 
@@ -273,6 +300,11 @@ namespace Cjayride.SmartShield
         private static bool IsOneHandedWeapon(ItemDrop.ItemData item)
         {
             return item?.m_shared != null && item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.OneHandedWeapon;
+        }
+
+        private static bool IsOneHandedAxe(ItemDrop.ItemData item)
+        {
+            return item?.m_shared != null && item.m_shared.m_skillType == Skills.SkillType.Axes;
         }
 
         private static bool IsRangedOrTwoHanded(ItemDrop.ItemData.ItemType type)

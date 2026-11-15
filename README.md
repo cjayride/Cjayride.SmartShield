@@ -8,6 +8,7 @@ Automatically equips your shield when you switch to a **one-handed weapon** in V
 - **Smart Weapon Switching** — Handles weapon draws and hotbar switching.
 - **Vanilla Sheathing Behavior** — By default, sheathing with `R` keeps both your weapon and shield visible on your back.
 - **Configurable Sheathing** — Choose whether your shield stays equipped when you sheath your weapon.
+- **In-game menu (Alt+S)** — Pick **Best in inventory** or **First in inventory**, and toggle auto-equip with a one-handed axe.
 
 ## ⚙️ Configuration
 
@@ -18,6 +19,9 @@ Configuration file:
 | Setting | Default | Description |
 |---|---|---|
 | `UnequipOnSheath` | `false` | Set to `true` to unequip the shield when sheathing, leaving only the weapon on your back. |
+| `SelectionMode` | `First` | `Best` (highest block) or `First` (first shield in inventory). Change from the Alt+S menu. |
+| `EquipShieldWithAxe` | `false` | Uncheck in the Alt+S menu to skip auto-equip (and stow the shield) when using a 1H axe. |
+| `MenuHotkey` | `S + LeftAlt` | Opens the SmartShield popup. |
 
 ## 📦 Installation
 
@@ -28,7 +32,7 @@ Configuration file:
 ## 📁 Package Information
 
 - **Thunderstore package:** `Cjayride.SmartShield`
-- **Build artifact:** `dist/Cjayride.SmartShield-1.0.14.zip`  
+- **Build artifact:** `dist/Cjayride.SmartShield-1.0.18.zip`  
   *Generated during the build process; not committed to the repository.*
 
 See [`CHANGELOG.md`](CHANGELOG.md) for release history. Thunderstore page copy lives in [`Package/README.md`](Package/README.md).
