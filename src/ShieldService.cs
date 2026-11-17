@@ -195,6 +195,16 @@ namespace Cjayride.SmartShield
                 return;
             }
 
+            if (!ModConfig.EquipShieldWithButcherKnife.Value && IsButcherKnife(right))
+            {
+                if (left?.m_shared != null && left.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
+                {
+                    UnequipSilent(player, left);
+                }
+
+                return;
+            }
+
             bool wantShield = ModConfig.AutoEquipOnOneHanded.Value;
             if (!wantShield && ModConfig.EquipAfterRanged.Value && previousRanged)
             {
@@ -305,6 +315,11 @@ namespace Cjayride.SmartShield
         private static bool IsOneHandedAxe(ItemDrop.ItemData item)
         {
             return item?.m_shared != null && item.m_shared.m_skillType == Skills.SkillType.Axes;
+        }
+
+        private static bool IsButcherKnife(ItemDrop.ItemData item)
+        {
+            return PrefabName(item).Equals("KnifeButcher", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsRangedOrTwoHanded(ItemDrop.ItemData.ItemType type)

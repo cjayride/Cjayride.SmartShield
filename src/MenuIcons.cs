@@ -7,6 +7,7 @@ namespace Cjayride.SmartShield
         internal static Texture2D Shield;
         internal static Texture2D SwordShield;
         internal static Texture2D Axe;
+        internal static Texture2D ButcherKnife;
         internal static Texture2D Bow;
         internal static Texture2D TwoHand;
         internal static Texture2D Sheath;
@@ -36,6 +37,7 @@ namespace Cjayride.SmartShield
             Shield = PaintShield();
             SwordShield = PaintSwordShield();
             Axe = PaintAxe();
+            ButcherKnife = PaintButcherKnife();
             Bow = PaintBow();
             TwoHand = PaintTwoHand();
             Sheath = PaintSheath();
@@ -144,6 +146,33 @@ namespace Cjayride.SmartShield
                 {
                     Put(px, s, x, y, blade);
                 }
+            }
+
+            return Bake(s, px);
+        }
+
+        private static Texture2D PaintButcherKnife()
+        {
+            int s = 32;
+            Color[] px = Clear(s);
+            Color steel = new Color(0.72f, 0.74f, 0.8f, 1f);
+            Color handle = new Color(0.45f, 0.3f, 0.14f, 1f);
+            for (int y = 6; y <= 24; y++)
+            {
+                Put(px, s, 12, y, steel);
+                Put(px, s, 13, y, steel);
+            }
+
+            for (int y = 4; y <= 11; y++)
+            {
+                Put(px, s, 14 + (y - 4) / 2, y, steel);
+            }
+
+            for (int y = 22; y <= 28; y++)
+            {
+                Put(px, s, 11, y, handle);
+                Put(px, s, 12, y, handle);
+                Put(px, s, 13, y, handle);
             }
 
             return Bake(s, px);

@@ -8,7 +8,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>Cjayride.SmartShield</AssemblyName>
     <RootNamespace>Cjayride.SmartShield</RootNamespace>
-    <Version>1.0.18</Version>
+    <Version>1.0.19</Version>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 

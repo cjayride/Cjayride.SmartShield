@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.19
+
+- **EquipShieldWithButcherKnife** (default `false`): skip auto-equip and stow the shield when equipping `KnifeButcher` (skinning); toggle in Alt+S Behavior.
+
 ## 1.0.18
 
 - Cursor no longer flickers: Valheim mouse-capture is released while the menu is open (no per-OnGUI cursor fighting).

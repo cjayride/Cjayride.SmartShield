@@ -14,6 +14,7 @@ namespace Cjayride.SmartShield
         internal static ConfigEntry<bool> UnequipOnTwoHanded;
         internal static ConfigEntry<bool> UnequipOnSheath;
         internal static ConfigEntry<bool> UnequipOnHotbarDeselect;
+        internal static ConfigEntry<bool> EquipShieldWithButcherKnife;
 
         internal static ConfigEntry<string> SelectionMode;
         internal static ConfigEntry<string> PreferredShield;
@@ -43,6 +44,8 @@ namespace Cjayride.SmartShield
                 "When true, stow the shield in inventory on R-sheath (weapon-only on your back). When false, vanilla dual back display (weapon + shield).");
             UnequipOnHotbarDeselect = config.Bind("Behavior", "UnequipOnHotbarDeselect", true,
                 "Unequip the shield when you deselect a one-handed weapon on the hotbar (press the same slot again). Does not unequip if you manually equip a shield alone.");
+            EquipShieldWithButcherKnife = config.Bind("Behavior", "EquipShieldWithButcherKnife", false,
+                "When false, do not auto-equip a shield with a butcher knife (skinning tamed animals).");
 
             SelectionMode = config.Bind("ShieldSelection", "SelectionMode", "First",
                 "Best = highest block power. First = first shield in inventory. Preferred = use PreferredShield.");

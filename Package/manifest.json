@@ -1,6 +1,6 @@
 {
     "name": "SmartShield",
-    "version_number": "1.0.18",
+    "version_number": "1.0.19",
     "website_url": "https://discord.gg/cjayride",
     "description": "Auto-equips a shield when you switch to a one-handed weapon, including after a bow or crossbow.",
     "dependencies": [

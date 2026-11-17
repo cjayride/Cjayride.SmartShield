@@ -175,6 +175,7 @@ namespace Cjayride.SmartShield
             GUILayout.Label("BEHAVIOR", _sectionStyle);
             Toggle(ModConfig.AutoEquipOnOneHanded, "Auto-equip shield with a one-handed weapon", MenuIcons.SwordShield);
             Toggle(ModConfig.EquipShieldWithAxe, "Equip shield with a 1H axe (uncheck for tree chopping)", MenuIcons.Axe);
+            Toggle(ModConfig.EquipShieldWithButcherKnife, "Equip shield with a butcher knife (uncheck for skinning)", MenuIcons.ButcherKnife);
             Toggle(ModConfig.EquipAfterRanged, "Also equip after switching from bow / crossbow", MenuIcons.Bow);
             Toggle(ModConfig.UnequipOnTwoHanded, "Unequip shield when using two-handed or ranged", MenuIcons.TwoHand);
             Toggle(ModConfig.UnequipOnSheath, "Stow shield on R-sheath (weapon only on your back)", MenuIcons.Sheath);

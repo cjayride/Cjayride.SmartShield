@@ -21,6 +21,7 @@ Configuration file:
 | `UnequipOnSheath` | `false` | Set to `true` to unequip the shield when sheathing, leaving only the weapon on your back. |
 | `SelectionMode` | `First` | `Best` (highest block) or `First` (first shield in inventory). Change from the Alt+S menu. |
 | `EquipShieldWithAxe` | `false` | Uncheck in the Alt+S menu to skip auto-equip (and stow the shield) when using a 1H axe. |
+| `EquipShieldWithButcherKnife` | `false` | Uncheck in the Alt+S menu to skip auto-equip (and stow the shield) when using a butcher knife. |
 | `MenuHotkey` | `S + LeftAlt` | Opens the SmartShield popup. |
 
 ## 📦 Installation
@@ -32,7 +33,7 @@ Configuration file:
 ## 📁 Package Information
 
 - **Thunderstore package:** `Cjayride.SmartShield`
-- **Build artifact:** `dist/Cjayride.SmartShield-1.0.18.zip`  
+- **Build artifact:** `dist/Cjayride.SmartShield-1.0.19.zip`  
   *Generated during the build process; not committed to the repository.*
 
 See [`CHANGELOG.md`](../CHANGELOG.md) for release history.
