@@ -8,6 +8,7 @@ namespace Cjayride.SmartShield
         internal static Texture2D SwordShield;
         internal static Texture2D Axe;
         internal static Texture2D ButcherKnife;
+        internal static Texture2D Torch;
         internal static Texture2D Bow;
         internal static Texture2D TwoHand;
         internal static Texture2D Sheath;
@@ -38,6 +39,7 @@ namespace Cjayride.SmartShield
             SwordShield = PaintSwordShield();
             Axe = PaintAxe();
             ButcherKnife = PaintButcherKnife();
+            Torch = PaintTorch();
             Bow = PaintBow();
             TwoHand = PaintTwoHand();
             Sheath = PaintSheath();
@@ -173,6 +175,40 @@ namespace Cjayride.SmartShield
                 Put(px, s, 11, y, handle);
                 Put(px, s, 12, y, handle);
                 Put(px, s, 13, y, handle);
+            }
+
+            return Bake(s, px);
+        }
+
+        private static Texture2D PaintTorch()
+        {
+            int s = 32;
+            Color[] px = Clear(s);
+            Color stick = new Color(0.45f, 0.3f, 0.14f, 1f);
+            Color flame = new Color(1f, 0.55f, 0.12f, 1f);
+            Color core = new Color(1f, 0.85f, 0.35f, 1f);
+            for (int y = 14; y <= 28; y++)
+            {
+                Put(px, s, 15, y, stick);
+                Put(px, s, 16, y, stick);
+            }
+
+            Put(px, s, 14, 8, flame);
+            Put(px, s, 15, 8, flame);
+            Put(px, s, 16, 8, flame);
+            Put(px, s, 17, 8, flame);
+            Put(px, s, 13, 9, flame);
+            Put(px, s, 14, 9, flame);
+            Put(px, s, 15, 9, core);
+            Put(px, s, 16, 9, core);
+            Put(px, s, 17, 9, flame);
+            Put(px, s, 18, 9, flame);
+            for (int y = 10; y <= 13; y++)
+            {
+                Put(px, s, 14, y, flame);
+                Put(px, s, 15, y, core);
+                Put(px, s, 16, y, core);
+                Put(px, s, 17, y, flame);
             }
 
             return Bake(s, px);

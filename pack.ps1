@@ -1,6 +1,6 @@
 # Thunderstore zip: flat layout (DLL + manifest + docs), same as prior releases.
 param(
-    [string] $Version = "1.0.20"
+    [string] $Version = "1.0.21"
 )
 
 $ErrorActionPreference = "Stop"

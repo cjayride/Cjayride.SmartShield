@@ -22,6 +22,7 @@ Configuration file:
 | `SelectionMode` | `First` | `Best` (highest block) or `First` (first shield in inventory). Change from the Alt+S menu. |
 | `EquipShieldWithAxe` | `false` | Uncheck in the Alt+S menu to skip auto-equip (and stow the shield) when using a 1H axe. |
 | `EquipShieldWithButcherKnife` | `false` | Uncheck in the Alt+S menu to skip auto-equip (and stow the shield) when using a butcher knife. |
+| `EquipShieldWithTorch` | `false` | Check in the Alt+S menu to auto-equip a shield when using a torch in the right hand. |
 | `MenuHotkey` | `S + LeftAlt` | Opens the SmartShield popup. |
 
 ## 📦 Installation

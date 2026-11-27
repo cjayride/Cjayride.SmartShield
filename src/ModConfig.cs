@@ -15,6 +15,7 @@ namespace Cjayride.SmartShield
         internal static ConfigEntry<bool> UnequipOnSheath;
         internal static ConfigEntry<bool> UnequipOnHotbarDeselect;
         internal static ConfigEntry<bool> EquipShieldWithButcherKnife;
+        internal static ConfigEntry<bool> EquipShieldWithTorch;
 
         internal static ConfigEntry<string> SelectionMode;
         internal static ConfigEntry<string> PreferredShield;
@@ -46,6 +47,8 @@ namespace Cjayride.SmartShield
                 "Unequip the shield when you deselect a one-handed weapon on the hotbar (press the same slot again). Does not unequip if you manually equip a shield alone.");
             EquipShieldWithButcherKnife = config.Bind("Behavior", "EquipShieldWithButcherKnife", false,
                 "When false, do not auto-equip a shield with a butcher knife (skinning tamed animals).");
+            EquipShieldWithTorch = config.Bind("Behavior", "EquipShieldWithTorch", false,
+                "When true, auto-equip a shield when a torch is in the right hand (torches use ItemType.Torch, not OneHandedWeapon).");
 
             SelectionMode = config.Bind("ShieldSelection", "SelectionMode", "First",
                 "Best = highest block power. First = first shield in inventory. Preferred = use PreferredShield.");
@@ -55,6 +58,7 @@ namespace Cjayride.SmartShield
                 "When false, do not auto-equip a shield with a one-handed axe (tree chopping).");
             EquipShieldWithAxe.SettingChanged += (_, __) => ShieldService.ReapplyFromMenu();
             EquipShieldWithButcherKnife.SettingChanged += (_, __) => ShieldService.ReapplyFromMenu();
+            EquipShieldWithTorch.SettingChanged += (_, __) => ShieldService.ReapplyFromMenu();
             MenuHotkey = config.Bind("UI", "MenuHotkey", new KeyboardShortcut(KeyCode.S, KeyCode.LeftAlt),
                 "Opens the SmartShield popup (selection mode and axe shield toggle). Default Alt+S.");
 

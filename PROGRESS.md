@@ -1,25 +1,31 @@
-# SmartShield — 1H axe auto-equip fix
+# SmartShield — torch auto-equip option
 
 ## Goal
-- With **Equip shield with a 1H axe** checked, auto-equip shield when drawing a one-handed axe.
+- Add **Equip shield with a torch** toggle (same pattern as 1H axe and butcher knife).
+- User tests in Gale profile before Thunderstore ship.
 
-## Status
-- Completed: 1.0.20 Release build succeeded (0 warnings).
+## Status: build done — ready for Gale test
 
-## Root cause (analysis)
-- Axe opt-out used `EquipShieldWithAxe = false` by default (correct for chopping).
-- When enabled, shield equip could still fail: immediate `Apply` on `EquipItem` could run before hands settled, and `Tick` would not re-run on the next frames because `_lastRight` already matched.
-- `ShouldWantShield` now treats the axe toggle as an explicit enable path (not only via `AutoEquipOnOneHanded`).
+## Root cause
+- Valheim torches are `ItemType.Torch`, not `OneHandedWeapon`; `ApplyInner` returned early.
 
-## Files changed
-- `src/ShieldService.cs` — `ShouldWantShield`, `ShouldStowShieldForRightHand`, stronger `IsOneHandedAxe`, `ApplyAfterEquipmentSettled`, deferred hook.
-- `src/Plugin.cs` — coroutine `ApplyAfterEquipFrames`.
-- `src/ModConfig.cs` — `SettingChanged` reapply for axe/butcher toggles.
-- Version bump 1.0.20 (csproj, manifest, pack.ps1, CHANGELOG).
+## Changes
+- `src/ModConfig.cs` — `EquipShieldWithTorch` (default `false`), menu reapply hook.
+- `src/ShieldService.cs` — torch path in apply logic, `IsTorch`, `ShouldWantShield`, hotbar deselect.
+- `src/OptionsMenu.cs` — Alt+S toggle.
+- `src/MenuIcons.cs` — torch icon.
+- Docs/manifest `1.0.21`.
 
-## Output
-- DLL: `D:\AI-Agent-Projects\cjaycraft\Cjayride.SmartShield\bin\Release\net481\Cjayride.SmartShield.dll`
+## Verification
+```text
+dotnet build D:\AI-Agent-Projects\cjaycraft\Cjayride.SmartShield\Cjayride.SmartShield.csproj -c Release
+```
 
-## Verify in-game
-1. Alt+S: enable **Equip shield with a 1H axe** (and **Auto-equip** if using that master toggle).
-2. Draw a 1H axe (Flint/Bronze/etc.) — shield should appear within ~1 frame.
+## Gale test
+1. Copy `bin\Release\net481\Cjayride.SmartShield.dll` over the profile plugin (back up first).
+2. Alt+S → enable **Equip shield with a torch**.
+3. Equip torch right hand → shield should auto-equip.
+4. Disable toggle → shield stows when torch equipped.
+
+## Next
+- User confirms in Gale; then run `pack.ps1` to ship.

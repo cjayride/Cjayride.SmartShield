@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.21
+
+- **EquipShieldWithTorch** (default `false`): opt-in auto-equip (and stow when disabled) when a torch is in the right hand; toggle in Alt+S Behavior. Torches use Valheim's `ItemType.Torch`, not `OneHandedWeapon`.
+
 ## 1.0.20
 
 - Fix: equipping a 1H axe with **Equip shield with a 1H axe** enabled now reliably auto-equips a shield (deferred apply after other equip logic settles; axe toggle counts even if general 1H auto-equip is off).

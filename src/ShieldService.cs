@@ -94,7 +94,7 @@ namespace Cjayride.SmartShield
                 && right == null
                 && !sheathed
                 && prevRight != null
-                && IsOneHandedWeapon(prevRight)
+                && CountsForHotbarShieldDeselect(prevRight)
                 && left?.m_shared != null
                 && left.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
             {
@@ -188,8 +188,20 @@ namespace Cjayride.SmartShield
                 return;
             }
 
-            if (rightType != ItemDrop.ItemData.ItemType.OneHandedWeapon)
+            bool isTorch = IsTorch(right);
+            bool isOneHanded = rightType == ItemDrop.ItemData.ItemType.OneHandedWeapon;
+            if (!isOneHanded && !isTorch)
             {
+                return;
+            }
+
+            if (isTorch && !ModConfig.EquipShieldWithTorch.Value)
+            {
+                if (left?.m_shared != null && left.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
+                {
+                    UnequipSilent(player, left);
+                }
+
                 return;
             }
 
@@ -309,6 +321,16 @@ namespace Cjayride.SmartShield
             return item?.m_shared != null && item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.OneHandedWeapon;
         }
 
+        private static bool CountsForHotbarShieldDeselect(ItemDrop.ItemData item)
+        {
+            if (IsOneHandedWeapon(item))
+            {
+                return true;
+            }
+
+            return ModConfig.EquipShieldWithTorch.Value && IsTorch(item);
+        }
+
         private static bool ShouldStowShieldForRightHand(ItemDrop.ItemData right)
         {
             if (right?.m_shared == null)
@@ -346,6 +368,11 @@ namespace Cjayride.SmartShield
                 return true;
             }
 
+            if (ModConfig.EquipShieldWithTorch.Value && IsTorch(right))
+            {
+                return true;
+            }
+
             return ModConfig.EquipAfterRanged.Value && previousRanged;
         }
 
@@ -374,6 +401,21 @@ namespace Cjayride.SmartShield
         private static bool IsButcherKnife(ItemDrop.ItemData item)
         {
             return PrefabName(item).Equals("KnifeButcher", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsTorch(ItemDrop.ItemData item)
+        {
+            if (item?.m_shared == null)
+            {
+                return false;
+            }
+
+            if (item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Torch)
+            {
+                return true;
+            }
+
+            return PrefabName(item).StartsWith("Torch", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsRangedOrTwoHanded(ItemDrop.ItemData.ItemType type)
