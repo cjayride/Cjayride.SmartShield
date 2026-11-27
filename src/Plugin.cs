@@ -1,3 +1,4 @@
+using System.Collections;
 using BepInEx;
 using HarmonyLib;
 using UnityEngine;
@@ -9,11 +10,13 @@ namespace Cjayride.SmartShield
     {
         public const string PluginGUID = "cjayride.smartshield";
         public const string PluginName = "SmartShield";
-        public const string PluginVersion = "1.0.19";
+        public const string PluginVersion = "1.0.20";
 
         internal static Plugin Instance;
         internal static Harmony Harmony;
         internal static BepInEx.Logging.ManualLogSource Log => Instance.Logger;
+
+        private Coroutine _deferredApply;
 
         private float _seenPlayerAt = -1f;
         private float _nextPoll;
@@ -35,6 +38,41 @@ namespace Cjayride.SmartShield
             Harmony.PatchAll(typeof(PatchControllerInInventoryEtc));
             Harmony.PatchAll(typeof(PatchMouseCapture));
             Logger.LogInfo("SmartShield " + PluginVersion + " loaded.");
+        }
+
+        internal static void ScheduleApplyAfterEquip()
+        {
+            Plugin host = Instance;
+            if (host == null || !ModConfig.Enabled.Value)
+            {
+                return;
+            }
+
+            if (host._deferredApply != null)
+            {
+                host.StopCoroutine(host._deferredApply);
+            }
+
+            host._deferredApply = host.StartCoroutine(host.ApplyAfterEquipFrames());
+        }
+
+        private IEnumerator ApplyAfterEquipFrames()
+        {
+            yield return null;
+            Player player = Player.m_localPlayer;
+            if (player != null && !player.IsDead() && !ShieldService.InternalChange)
+            {
+                ShieldService.ApplyAfterEquipmentSettled(player);
+            }
+
+            yield return null;
+            player = Player.m_localPlayer;
+            if (player != null && !player.IsDead() && !ShieldService.InternalChange)
+            {
+                ShieldService.ApplyAfterEquipmentSettled(player);
+            }
+
+            _deferredApply = null;
         }
 
         private void Update()

@@ -52,6 +52,19 @@ namespace Cjayride.SmartShield
             }
 
             Tick(player);
+            Plugin.ScheduleApplyAfterEquip();
+        }
+
+        internal static void ApplyAfterEquipmentSettled(Player player)
+        {
+            if (player == null || player.IsDead())
+            {
+                return;
+            }
+
+            _lastRight = player.GetRightItem();
+            _wasSheathed = IsSheathed(player);
+            Apply();
         }
 
         internal static void Tick(Player player)
@@ -185,7 +198,7 @@ namespace Cjayride.SmartShield
                 return;
             }
 
-            if (!ModConfig.EquipShieldWithAxe.Value && IsOneHandedAxe(right))
+            if (ShouldStowShieldForRightHand(right))
             {
                 if (left?.m_shared != null && left.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
                 {
@@ -195,23 +208,7 @@ namespace Cjayride.SmartShield
                 return;
             }
 
-            if (!ModConfig.EquipShieldWithButcherKnife.Value && IsButcherKnife(right))
-            {
-                if (left?.m_shared != null && left.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Shield)
-                {
-                    UnequipSilent(player, left);
-                }
-
-                return;
-            }
-
-            bool wantShield = ModConfig.AutoEquipOnOneHanded.Value;
-            if (!wantShield && ModConfig.EquipAfterRanged.Value && previousRanged)
-            {
-                wantShield = true;
-            }
-
-            if (!wantShield)
+            if (!ShouldWantShield(right, previousRanged))
             {
                 return;
             }
@@ -312,9 +309,66 @@ namespace Cjayride.SmartShield
             return item?.m_shared != null && item.m_shared.m_itemType == ItemDrop.ItemData.ItemType.OneHandedWeapon;
         }
 
+        private static bool ShouldStowShieldForRightHand(ItemDrop.ItemData right)
+        {
+            if (right?.m_shared == null)
+            {
+                return false;
+            }
+
+            if (!ModConfig.EquipShieldWithAxe.Value && IsOneHandedAxe(right))
+            {
+                return true;
+            }
+
+            return !ModConfig.EquipShieldWithButcherKnife.Value && IsButcherKnife(right);
+        }
+
+        private static bool ShouldWantShield(ItemDrop.ItemData right, bool previousRanged)
+        {
+            if (right?.m_shared == null || ShouldStowShieldForRightHand(right))
+            {
+                return false;
+            }
+
+            if (ModConfig.AutoEquipOnOneHanded.Value)
+            {
+                return true;
+            }
+
+            if (ModConfig.EquipShieldWithAxe.Value && IsOneHandedAxe(right))
+            {
+                return true;
+            }
+
+            if (ModConfig.EquipShieldWithButcherKnife.Value && IsButcherKnife(right))
+            {
+                return true;
+            }
+
+            return ModConfig.EquipAfterRanged.Value && previousRanged;
+        }
+
         private static bool IsOneHandedAxe(ItemDrop.ItemData item)
         {
-            return item?.m_shared != null && item.m_shared.m_skillType == Skills.SkillType.Axes;
+            if (item?.m_shared == null
+                || item.m_shared.m_itemType != ItemDrop.ItemData.ItemType.OneHandedWeapon)
+            {
+                return false;
+            }
+
+            if (item.m_shared.m_skillType == Skills.SkillType.Axes)
+            {
+                return true;
+            }
+
+            string prefab = PrefabName(item);
+            if (prefab.StartsWith("Axe", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return prefab.IndexOf("ThrowAxe", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private static bool IsButcherKnife(ItemDrop.ItemData item)

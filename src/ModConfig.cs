@@ -53,6 +53,8 @@ namespace Cjayride.SmartShield
                 "Prefab name used when SelectionMode is Preferred (example: ShieldWood).");
             EquipShieldWithAxe = config.Bind("ShieldSelection", "EquipShieldWithAxe", false,
                 "When false, do not auto-equip a shield with a one-handed axe (tree chopping).");
+            EquipShieldWithAxe.SettingChanged += (_, __) => ShieldService.ReapplyFromMenu();
+            EquipShieldWithButcherKnife.SettingChanged += (_, __) => ShieldService.ReapplyFromMenu();
             MenuHotkey = config.Bind("UI", "MenuHotkey", new KeyboardShortcut(KeyCode.S, KeyCode.LeftAlt),
                 "Opens the SmartShield popup (selection mode and axe shield toggle). Default Alt+S.");
 

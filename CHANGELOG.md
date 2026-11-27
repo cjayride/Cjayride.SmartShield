@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.20
+
+- Fix: equipping a 1H axe with **Equip shield with a 1H axe** enabled now reliably auto-equips a shield (deferred apply after other equip logic settles; axe toggle counts even if general 1H auto-equip is off).
+- Broader axe detection: `Axes` skill, `Axe*` prefabs, and Warfare-style `ThrowAxe*` throwing axes.
+
 ## 1.0.19
 
 - **EquipShieldWithButcherKnife** (default `false`): skip auto-equip and stow the shield when equipping `KnifeButcher` (skinning); toggle in Alt+S Behavior.
